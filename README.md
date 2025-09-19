@@ -1,6 +1,6 @@
-# WORD UP - Advanced Business Wordlist Generator
+# WORD UP - Wordlist Operations & Reconnaissance Data - Ultimate Profiling
 
-A high-performance, memory-safe wordlist generator inspired by CeWL, written in Rust.
+A high-performance, memory-safe reconnaissance and profiling tool inspired by CeWL, written in Rust.
 
 ## Why Rust?
 

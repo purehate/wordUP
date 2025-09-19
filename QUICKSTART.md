@@ -1,4 +1,4 @@
-# WORD UP - Quick Start Guide
+# WORD UP - Wordlist Operations & Reconnaissance Data - Ultimate Profiling - Quick Start Guide
 
 ## 🚀 **Get Started in 3 Steps**
 

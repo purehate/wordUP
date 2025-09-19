@@ -3,7 +3,7 @@ name = "word-up"
 version = "0.1.0"
 edition = "2021"
 authors = ["Your Name <your.email@example.com>"]
-description = "Advanced Business Wordlist Generator"
+description = "Wordlist Operations & Reconnaissance Data - Ultimate Profiling"
 license = "MIT"
 
 [dependencies]

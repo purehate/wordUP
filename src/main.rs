@@ -1,4 +1,4 @@
-//! WORD UP - Advanced Business Wordlist Generator
+//! WORD UP - Wordlist Operations & Reconnaissance Data - Ultimate Profiling
 //! 
 //! A high-performance wordlist generator inspired by CeWL, written in Rust.
 //! Extracts words from business websites and applies advanced statistical analysis.
@@ -20,7 +20,7 @@ use word_up::WordUpConfig;
 
 #[derive(Parser)]
 #[command(name = "word-up")]
-#[command(about = "Advanced Business Wordlist Generator")]
+#[command(about = "Wordlist Operations & Reconnaissance Data - Ultimate Profiling")]
 #[command(version = "0.1.0")]
 #[command(before_help = r#"
     ██╗    ██╗ ██████╗ ██████╗ ██████╗     ██╗   ██╗██████╗ 
@@ -30,7 +30,7 @@ use word_up::WordUpConfig;
     ╚███╔███╔╝╚██████╔╝██║  ██║██████╔╝    ╚██████╔╝██║     
      ╚══╝╚══╝  ╚═════╝ ╚═╝  ╚═╝╚═════╝      ╚═════╝ ╚═╝     
     
-    🚀 Advanced Business Wordlist Generator (Rust Edition)
+    🚀 Wordlist Operations & Reconnaissance Data - Ultimate Profiling (Rust Edition)
     ⚡ High-Performance • Memory-Safe • Cross-Platform
 "#)]
 struct Args {
@@ -115,7 +115,7 @@ async fn main() -> Result<()> {
      ╚══╝╚══╝  ╚═════╝ ╚═╝  ╚═╝╚═════╝      ╚═════╝ ╚═╝     
     "#);
     println!("{}", "=".repeat(60));
-    println!("🚀 Advanced Business Wordlist Generator (Rust Edition)");
+    println!("🚀 Wordlist Operations & Reconnaissance Data - Ultimate Profiling (Rust Edition)");
     println!("⚡ High-Performance • Memory-Safe • Cross-Platform");
     println!("{}", "=".repeat(60));
     

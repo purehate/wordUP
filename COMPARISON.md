@@ -1,4 +1,4 @@
-# Python vs Rust: WORD UP Comparison
+# Python vs Rust: WORD UP - Wordlist Operations & Reconnaissance Data - Ultimate Profiling Comparison
 
 ## Overview
 
