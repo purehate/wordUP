@@ -1,0 +1,62 @@
+# Rust
+/target/
+Cargo.lock
+**/*.rs.bk
+
+# Python (if any remnants)
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+.venv/
+venv/
+ENV/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Project output files (should be in project directories)
+wordup_*/
+*.txt
+*.json
+!README.md
+!QUICKSTART.md
+!COMPARISON.md
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
