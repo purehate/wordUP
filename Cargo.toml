@@ -1,0 +1,57 @@
+[package]
+name = "word-up"
+version = "0.1.0"
+edition = "2021"
+authors = ["Your Name <your.email@example.com>"]
+description = "Advanced Business Wordlist Generator"
+license = "MIT"
+
+[dependencies]
+# HTTP client
+reqwest = { version = "0.11", features = ["json", "stream"] }
+tokio = { version = "1.0", features = ["full"] }
+
+# HTML parsing
+scraper = "0.18"
+select = "0.6"
+
+# DNS resolution
+trust-dns-resolver = "0.23"
+
+# Text processing
+regex = "1.10"
+unicode-normalization = "0.1"
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# CLI
+clap = { version = "4.0", features = ["derive"] }
+
+# Error handling
+anyhow = "1.0"
+thiserror = "1.0"
+
+# Collections and utilities
+itertools = "0.12"
+futures = "0.3"
+url = "2.4"
+uuid = { version = "1.0", features = ["v4"] }
+
+# Logging
+env_logger = "0.10"
+log = "0.4"
+
+# Async utilities
+futures-util = "0.3"
+tokio-util = "0.7"
+
+# Text processing
+unicode-segmentation = "1.10"
+
+# Random number generation
+rand = "0.8"
+
+# Date/time handling
+chrono = { version = "0.4", features = ["serde"] }
