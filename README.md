@@ -33,14 +33,6 @@ This tool draws inspiration and techniques from several excellent open-source pr
 - **Digininja** for the original CeWL concept and implementation
 - **Rust Community** for the amazing ecosystem and performance optimizations
 
-## Why Rust?
-
-- **🚀 Performance**: 10-100x faster than Python for network operations and text processing
-- **🛡️ Memory Safety**: No garbage collection overhead, zero-cost abstractions
-- **⚡ Concurrency**: Excellent async/await support for parallel processing
-- **📦 Single Binary**: No dependencies, easy distribution
-- **🌍 Cross-Platform**: Compiles to native code for any platform
-
 ## Features
 
 ### 🔍 **Multi-Source Subdomain Discovery**
@@ -60,20 +52,20 @@ This tool draws inspiration and techniques from several excellent open-source pr
 - Common word filtering
 - **Async parallel processing** for maximum speed
 
-### 🧮 **Statistical Analysis**
+### **Statistical Analysis**
 - Word frequency analysis
 - TF-IDF-like scoring
 - Top word identification
 - Company-specific term extraction
 
-### 🔄 **Word Transformation Techniques**
+### **Word Transformation Techniques**
 - **Leetspeak** conversions (a→4, e→3, etc.)
 - **Permutation generation** with separators
 - **Number variations** (word1, 1word, word11)
 - **Suffix additions** (ing, ed, er, etc.)
 - **Markov chain** word generation
 
-### 📁 **Comprehensive Output**
+### **Comprehensive Output**
 - **Raw extracted words** - original words from websites
 - **Comprehensive wordlist** - with transformations and metadata
 - **Final combined wordlist** - all words with Markov generation
