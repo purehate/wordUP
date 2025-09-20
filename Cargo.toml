@@ -3,7 +3,7 @@ name = "word-up"
 version = "0.1.0"
 edition = "2021"
 authors = ["Your Name <your.email@example.com>"]
-description = "Wordlist Operations & Reconnaissance Data - Ultimate Profiling"
+description = "Wordlist Operations & Reconnaissance Data - Ultimate Profiling (Inspired by CeWL, hashcat-utils, and evilmog/hashcat-scripts)"
 license = "MIT"
 
 [dependencies]

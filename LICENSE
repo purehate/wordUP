@@ -2,6 +2,18 @@ MIT License
 
 Copyright (c) 2025 Martin Bos
 
+## Attribution
+
+This project draws inspiration and techniques from several open-source projects:
+
+- **CeWL (Custom Word List generator)** by Digininja - https://github.com/digininja/CeWL
+- **hashcat-utils** by Hashcat Team - https://github.com/hashcat/hashcat-utils  
+- **evilmog/hashcat-scripts** by EvilMog - https://github.com/evilmog/hashcat-scripts
+
+Special thanks to the security community for their contributions and the techniques
+that inspired this tool. This project is built upon the excellent work of these
+developers and the broader open-source security community.
+
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights

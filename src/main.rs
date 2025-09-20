@@ -2,6 +2,16 @@
 //! 
 //! A high-performance wordlist generator inspired by CeWL, written in Rust.
 //! Extracts words from business websites and applies advanced statistical analysis.
+//!
+//! ## Credits & Inspiration
+//! 
+//! This tool draws inspiration from several excellent open-source projects:
+//! - CeWL (Custom Word List generator) - https://github.com/digininja/CeWL
+//! - hashcat-utils - https://github.com/hashcat/hashcat-utils
+//! - evilmog/hashcat-scripts - https://github.com/evilmog/hashcat-scripts
+//!
+//! Special thanks to EvilMog, the Hashcat Team, and Digininja for their contributions
+//! to the security community and the techniques that inspired this tool.
 
 use anyhow::Result;
 use clap::Parser;
@@ -32,6 +42,7 @@ use word_up::WordUpConfig;
     
     🚀 Wordlist Operations & Reconnaissance Data - Ultimate Profiling (Rust Edition)
     ⚡ High-Performance • Memory-Safe • Cross-Platform
+    💡 Inspired by CeWL, hashcat-utils, and evilmog/hashcat-scripts
 "#)]
 struct Args {
     /// Company name or domain to target
@@ -191,11 +202,88 @@ async fn main() -> Result<()> {
     }
     println!();
     
-    // Phase 5: Wordlist Generation
-    println!("[+] Phase 5: Wordlist Generation");
+    // Phase 5: Advanced Wordlist Generation
+    println!("[+] Phase 5: Advanced Wordlist Generation");
     println!("{}", "-".repeat(40));
     
     let word_processor = WordProcessor::new(&config);
+    
+    // Apply expander technique
+    println!("[+] Applying expander technique...");
+    let expanded_words = word_processor.expander_technique(&extraction_results.words);
+    println!("    Generated {} expanded words", expanded_words.len());
+    
+    // Apply cutb technique
+    println!("[+] Applying cutb technique...");
+    let cut_words = word_processor.cutb_technique(&extraction_results.words);
+    println!("    Generated {} cut words", cut_words.len());
+    
+    // Apply prince technique
+    println!("[+] Applying prince technique...");
+    let prince_words = word_processor.prince_technique(&extraction_results.words);
+    println!("    Generated {} prince words", prince_words.len());
+    
+    // Apply hybrid attack
+    println!("[+] Applying hybrid attack technique...");
+    let hybrid_words = word_processor.hybrid_attack(&extraction_results.words);
+    println!("    Generated {} hybrid words", hybrid_words.len());
+    
+    // Apply iterative refinement (3 iterations)
+    println!("[+] Applying iterative refinement...");
+    let refined_words = word_processor.iterative_refinement(&extraction_results.words, 3);
+    println!("    Generated {} refined words", refined_words.len());
+    
+    // Generate masks for hashcat
+    println!("[+] Generating hashcat masks...");
+    let masks = word_processor.generate_masks(&extraction_results.words);
+    println!("    Generated {} unique masks", masks.len());
+    
+    // Apply combinator technique
+    println!("[+] Applying combinator technique...");
+    let combinator_words = word_processor.combinator_technique(&extraction_results.words, &extraction_results.words);
+    println!("    Generated {} combinator words", combinator_words.len());
+    
+    // Generate hashcat rules
+    println!("[+] Generating hashcat rules...");
+    let rules = word_processor.rli2_technique(&extraction_results.words);
+    println!("    Generated {} hashcat rules", rules.len());
+    
+    // Apply maskgen technique
+    println!("[+] Applying maskgen technique...");
+    let maskgen_masks = word_processor.maskgen_technique(&extraction_results.words);
+    println!("    Generated {} maskgen masks", maskgen_masks.len());
+    
+    // Apply advanced pipeline
+    println!("[+] Applying advanced pipeline...");
+    let pipeline_words = word_processor.advanced_pipeline(&extraction_results.words);
+    println!("    Generated {} pipeline words", pipeline_words.len());
+    
+    // Apply PACK techniques
+    println!("[+] Applying PACK StatsGen analysis...");
+    let pack_stats = word_processor.pack_statsgen(&extraction_results.words);
+    println!("    Analyzed {} words with {} unique patterns", 
+             pack_stats.get("total_words").unwrap_or(&0), 
+             pack_stats.get("unique_patterns").unwrap_or(&0));
+    
+    println!("[+] Applying PACK PolicyGen analysis...");
+    let pack_policy = word_processor.pack_policygen(&extraction_results.words);
+    println!("    Policy analysis: min_length={}, max_length={}", 
+             pack_policy.get("min_length").unwrap_or(&0),
+             pack_policy.get("max_length").unwrap_or(&0));
+    
+    println!("[+] Applying PACK RuleGen...");
+    let pack_rules = word_processor.pack_rulegen(&extraction_results.words);
+    println!("    Generated {} PACK rules", pack_rules.len());
+    
+    println!("[+] Applying PACK MaskGen...");
+    let pack_masks = word_processor.pack_maskgen(&extraction_results.words);
+    println!("    Generated {} PACK masks", pack_masks.len());
+    
+    println!("[+] Running PACK comprehensive analysis...");
+    let pack_analysis = word_processor.pack_comprehensive_analysis(&extraction_results.words);
+    println!("    Comprehensive analysis complete");
+    
+    // Create comprehensive wordlist with all techniques
     let comprehensive_wordlist = word_processor.create_comprehensive_wordlist(
         &extraction_results.words,
         &extraction_results.metadata,
@@ -263,6 +351,63 @@ async fn main() -> Result<()> {
         save_wordlist(&metadata_filename, &extraction_results.metadata).await?;
         println!("    Metadata words saved: {} ({} words)", metadata_filename, extraction_results.metadata.len());
     }
+    
+    // Save hashcat masks
+    if !masks.is_empty() {
+        let masks_filename = format!("{}/{}_masks.txt", project_dir, base_filename);
+        save_wordlist(&masks_filename, &masks).await?;
+        println!("    Hashcat masks saved: {} ({} masks)", masks_filename, masks.len());
+    }
+    
+    // Save hashcat rules
+    if !rules.is_empty() {
+        let rules_filename = format!("{}/{}_rules.txt", project_dir, base_filename);
+        save_wordlist(&rules_filename, &rules).await?;
+        println!("    Hashcat rules saved: {} ({} rules)", rules_filename, rules.len());
+    }
+    
+    // Save maskgen masks
+    if !maskgen_masks.is_empty() {
+        let maskgen_filename = format!("{}/{}_maskgen.txt", project_dir, base_filename);
+        save_wordlist(&maskgen_filename, &maskgen_masks).await?;
+        println!("    Maskgen masks saved: {} ({} masks)", maskgen_filename, maskgen_masks.len());
+    }
+    
+    // Save combinator words
+    if !combinator_words.is_empty() {
+        let combinator_filename = format!("{}/{}_combinator.txt", project_dir, base_filename);
+        let combinator_vec: Vec<String> = combinator_words.iter().cloned().collect();
+        save_wordlist(&combinator_filename, &combinator_vec).await?;
+        println!("    Combinator words saved: {} ({} words)", combinator_filename, combinator_words.len());
+    }
+    
+    // Save pipeline words
+    if !pipeline_words.is_empty() {
+        let pipeline_filename = format!("{}/{}_pipeline.txt", project_dir, base_filename);
+        let pipeline_vec: Vec<String> = pipeline_words.iter().cloned().collect();
+        save_wordlist(&pipeline_filename, &pipeline_vec).await?;
+        println!("    Pipeline words saved: {} ({} words)", pipeline_filename, pipeline_words.len());
+    }
+    
+    // Save PACK rules
+    if !pack_rules.is_empty() {
+        let pack_rules_filename = format!("{}/{}_pack_rules.txt", project_dir, base_filename);
+        save_wordlist(&pack_rules_filename, &pack_rules).await?;
+        println!("    PACK rules saved: {} ({} rules)", pack_rules_filename, pack_rules.len());
+    }
+    
+    // Save PACK masks
+    if !pack_masks.is_empty() {
+        let pack_masks_filename = format!("{}/{}_pack_masks.txt", project_dir, base_filename);
+        save_wordlist(&pack_masks_filename, &pack_masks).await?;
+        println!("    PACK masks saved: {} ({} masks)", pack_masks_filename, pack_masks.len());
+    }
+    
+    // Save PACK analysis
+    let pack_analysis_filename = format!("{}/{}_pack_analysis.json", project_dir, base_filename);
+    let pack_analysis_json = serde_json::to_string_pretty(&pack_analysis)?;
+    tokio::fs::write(&pack_analysis_filename, pack_analysis_json).await?;
+    println!("    PACK analysis saved: {}", pack_analysis_filename);
     
     // Save statistics
     let stats_filename = format!("{}/{}_stats.json", project_dir, base_filename);

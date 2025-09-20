@@ -2,6 +2,37 @@
 
 A high-performance, memory-safe reconnaissance and profiling tool inspired by CeWL, written in Rust.
 
+## Credits & Inspiration
+
+This tool draws inspiration and techniques from several excellent open-source projects:
+
+### Primary Inspiration
+- **[CeWL (Custom Word List generator)](https://github.com/digininja/CeWL)** - The original inspiration for web-based wordlist generation
+- **[hashcat-utils](https://github.com/hashcat/hashcat-utils)** - Advanced password cracking utilities that inspired our word processing techniques
+- **[evilmog/hashcat-scripts](https://github.com/evilmog/hashcat-scripts)** - Random hashcat scripts that provided advanced attack methodologies
+- **[PACK (Password Analysis and Cracking Kit)](https://github.com/iphelix/pack)** - Comprehensive password analysis toolkit that inspired our statistical analysis techniques
+
+### Techniques Integrated
+- **Expander Technique** - Inspired by `hashcat-utils/expander.bin`
+- **Cutb Technique** - Inspired by `hashcat-utils/cutb.bin`
+- **Combinator Technique** - Inspired by `hashcat-utils/combinator.bin`
+- **RLI2 Technique** - Inspired by `hashcat-utils/rli2.bin`
+- **Maskgen Technique** - Inspired by `hashcat-utils/maskgen.bin`
+- **Prince Processor** - Inspired by princeprocessor functionality
+- **Iterative Refinement** - Based on EvilMog's methodology
+- **PACK StatsGen** - Inspired by `PACK/statsgen.py` for password statistics analysis
+- **PACK PolicyGen** - Inspired by `PACK/policygen.py` for password policy analysis
+- **PACK RuleGen** - Inspired by `PACK/rulegen.py` for advanced rule generation
+- **PACK MaskGen** - Inspired by `PACK/maskgen.py` for pattern-based mask generation
+- **Web Scraping** - Inspired by CeWL's approach to extracting words from websites
+
+### Special Thanks
+- **EvilMog** for the comprehensive hashcat methodology and advanced attack patterns
+- **Hashcat Team** for the excellent utility tools and documentation
+- **Peter Kacherginsky (iphelix)** for the PACK toolkit and password analysis techniques
+- **Digininja** for the original CeWL concept and implementation
+- **Rust Community** for the amazing ecosystem and performance optimizations
+
 ## Why Rust?
 
 - **🚀 Performance**: 10-100x faster than Python for network operations and text processing
