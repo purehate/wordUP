@@ -13,14 +13,14 @@
 
 ## Features
 
-### 🔍 **Multi-Source Subdomain Discovery**
+### **Multi-Source Subdomain Discovery**
 - **Certificate Transparency Logs** (crt.sh)
 - **DNSDumpster** integration
 - **Wayback Machine** historical data
 - **DNS Brute Force** with 100+ common subdomains
 - **Company-specific variations** (business suffixes, prefixes, years)
 
-### 📊 **Advanced Text Processing**
+### **Advanced Text Processing**
 - Intelligent word extraction from HTML content
 - Meta tag and alt attribute parsing
 - **Email address extraction** from mailto links and content
