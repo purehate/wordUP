@@ -99,6 +99,45 @@ struct WordUpResults {
     timestamp: String,
 }
 
+async fn find_valid_domain(company_name: &str, tlds: &[&str]) -> Option<String> {
+    let client = reqwest::Client::builder()
+        .timeout(std::time::Duration::from_secs(3))
+        .build()
+        .ok()?;
+    
+    for tld in tlds {
+        let domain = format!("{}.{}", company_name, tld);
+        
+        // Try to resolve DNS first (faster check)
+        if let Ok(resolver) = trust_dns_resolver::TokioAsyncResolver::tokio_from_system_conf() {
+            if resolver.lookup_ip(&domain).await.is_ok() {
+                // Verify with HTTP request
+                let test_urls = vec![
+                    format!("https://{}", domain),
+                    format!("http://{}", domain),
+                    format!("https://www.{}", domain),
+                    format!("http://www.{}", domain),
+                ];
+                
+                for url in test_urls {
+                    if let Ok(response) = client.head(&url).send().await {
+                        if response.status().is_success() || response.status().is_redirection() {
+                            println!("[+] Found valid domain: {} (verified via {})", domain, url);
+                            return Some(domain);
+                        }
+                    }
+                }
+                
+                // If DNS resolves but HTTP fails, still consider it valid
+                println!("[+] Found valid domain: {} (DNS resolution confirmed)", domain);
+                return Some(domain);
+            }
+        }
+    }
+    
+    None
+}
+
 async fn get_unique_project_dir(base_dir: &str) -> Result<String> {
     let mut project_dir = base_dir.to_string();
     let mut counter = 1;
@@ -137,7 +176,14 @@ async fn main() -> Result<()> {
         (company_name, domain)
     } else {
         let company_name = args.target.clone();
-        let domain = format!("{}.com", company_name);
+        // Try common TLDs to find the actual domain
+        println!("[+] Detecting TLD for company: {}", company_name);
+        let common_tlds = vec!["com", "org", "net", "edu", "gov", "mil", "int", "co.uk", "co.jp", "de", "fr", "it", "es", "nl", "ca", "au"];
+        let domain = find_valid_domain(&company_name, &common_tlds).await
+            .unwrap_or_else(|| {
+                println!("[!] No valid TLD found, defaulting to .com");
+                format!("{}.com", company_name)
+            });
         (company_name, domain)
     };
     
