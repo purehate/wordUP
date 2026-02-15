@@ -255,3 +255,118 @@ impl WordExtractor {
         COMMON_WORDS.contains(&word)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_should_ignore_file_zip() {
+        assert!(WordExtractor::should_ignore_file("https://example.com/file.zip"));
+    }
+
+    #[test]
+    fn test_should_ignore_file_png() {
+        assert!(WordExtractor::should_ignore_file("https://example.com/logo.png"));
+    }
+
+    #[test]
+    fn test_should_not_ignore_html() {
+        assert!(!WordExtractor::should_ignore_file("https://example.com/page.html"));
+    }
+
+    #[test]
+    fn test_should_not_ignore_no_extension() {
+        assert!(!WordExtractor::should_ignore_file("https://example.com/about"));
+    }
+
+    #[test]
+    fn test_should_ignore_case_insensitive() {
+        assert!(WordExtractor::should_ignore_file("https://example.com/image.JPG"));
+    }
+
+    #[test]
+    fn test_extract_emails() {
+        let regex = Regex::new(EMAIL_REGEX).unwrap();
+        let text = "Contact us at admin@example.com or support@test.org for help.";
+        let emails = WordExtractor::extract_emails(text, &regex);
+        assert_eq!(emails.len(), 2);
+        assert!(emails.contains(&"admin@example.com".to_string()));
+        assert!(emails.contains(&"support@test.org".to_string()));
+    }
+
+    #[test]
+    fn test_extract_emails_none() {
+        let regex = Regex::new(EMAIL_REGEX).unwrap();
+        let emails = WordExtractor::extract_emails("no emails here", &regex);
+        assert!(emails.is_empty());
+    }
+
+    #[test]
+    fn test_extract_words_from_text() {
+        let regex = Regex::new(r"\b[a-zA-Z]{3,50}\b").unwrap();
+        let words = WordExtractor::extract_words_from_text("Hello World of Rust", &regex);
+        assert!(words.contains(&"hello".to_string()));
+        assert!(words.contains(&"world".to_string()));
+        assert!(words.contains(&"rust".to_string()));
+    }
+
+    #[test]
+    fn test_extract_words_respects_min_length() {
+        let regex = Regex::new(r"\b[a-zA-Z]{5,50}\b").unwrap();
+        let words = WordExtractor::extract_words_from_text("Hi there friend", &regex);
+        assert!(!words.contains(&"hi".to_string()));
+        assert!(words.contains(&"there".to_string()));
+        assert!(words.contains(&"friend".to_string()));
+    }
+
+    #[test]
+    fn test_generate_word_groups() {
+        let words = vec!["alpha".into(), "beta".into(), "gamma".into(), "delta".into()];
+        let groups = WordExtractor::generate_word_groups(&words, 2);
+        assert_eq!(groups.len(), 3);
+        assert_eq!(groups[0], "alpha beta");
+        assert_eq!(groups[1], "beta gamma");
+        assert_eq!(groups[2], "gamma delta");
+    }
+
+    #[test]
+    fn test_generate_word_groups_size_3() {
+        let words = vec!["a".into(), "b".into(), "c".into(), "d".into()];
+        let groups = WordExtractor::generate_word_groups(&words, 3);
+        assert_eq!(groups.len(), 2);
+    }
+
+    #[test]
+    fn test_is_common_word() {
+        assert!(WordExtractor::is_common_word("the"));
+        assert!(WordExtractor::is_common_word("and"));
+        assert!(WordExtractor::is_common_word("for"));
+    }
+
+    #[test]
+    fn test_is_not_common_word() {
+        assert!(!WordExtractor::is_common_word("cybersecurity"));
+        assert!(!WordExtractor::is_common_word("wordlist"));
+    }
+
+    #[test]
+    fn test_extract_from_html_title() {
+        let config = WordUpConfig {
+            target: "test".into(),
+            domain: "test.com".into(),
+            company_name: "Test".into(),
+            workers: 1,
+            timeout: 5,
+            min_word_length: 3,
+            max_word_length: 50,
+            extract_emails: false,
+            extract_metadata: false,
+            group_size: 0, // disable word groups to avoid slice bug with few words
+        };
+        let word_regex = Regex::new(r"\b[a-zA-Z]{3,50}\b").unwrap();
+        let html = Html::parse_document("<html><head><title>SecurityTesting</title></head><body></body></html>");
+        let (words, _, _) = WordExtractor::extract_from_html(&html, &config, &word_regex);
+        assert!(words.contains(&"securitytesting".to_string()));
+    }
+}

@@ -972,3 +972,386 @@ fn capitalize_first(s: &str) -> String {
         Some(first) => first.to_uppercase().collect::<String>() + chars.as_str(),
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn test_config() -> WordUpConfig {
+        WordUpConfig {
+            target: "testcorp".into(),
+            domain: "testcorp.com".into(),
+            company_name: "TestCorp".into(),
+            workers: 1,
+            timeout: 5,
+            min_word_length: 3,
+            max_word_length: 50,
+            extract_emails: false,
+            extract_metadata: false,
+            group_size: 2,
+        }
+    }
+
+    fn test_words() -> Vec<String> {
+        vec!["password".into(), "security".into(), "admin".into(), "login".into()]
+    }
+
+    // --- capitalize_first ---
+
+    #[test]
+    fn test_capitalize_first_normal() {
+        assert_eq!(capitalize_first("hello"), "Hello");
+    }
+
+    #[test]
+    fn test_capitalize_first_empty() {
+        assert_eq!(capitalize_first(""), "");
+    }
+
+    #[test]
+    fn test_capitalize_first_already() {
+        assert_eq!(capitalize_first("Hello"), "Hello");
+    }
+
+    // --- convert_umlauts ---
+
+    #[test]
+    fn test_convert_umlauts() {
+        assert_eq!(WordProcessor::convert_umlauts("über"), "ueber");
+        assert_eq!(WordProcessor::convert_umlauts("Ärger"), "Aerger");
+        assert_eq!(WordProcessor::convert_umlauts("Straße"), "Strasse");
+    }
+
+    #[test]
+    fn test_convert_umlauts_no_umlauts() {
+        assert_eq!(WordProcessor::convert_umlauts("hello"), "hello");
+    }
+
+    // --- expander_technique ---
+
+    #[test]
+    fn test_expander_contains_original() {
+        let wp = WordProcessor::new(&test_config());
+        let words = vec!["test".into()];
+        let result = wp.expander_technique(&words);
+        assert!(result.contains(&"test".to_string()));
+    }
+
+    #[test]
+    fn test_expander_generates_variations() {
+        let wp = WordProcessor::new(&test_config());
+        let words = vec!["pass".into()];
+        let result = wp.expander_technique(&words);
+        assert!(result.contains(&"pass123".to_string()));
+        assert!(result.contains(&"PASS".to_string()));
+        assert!(result.contains(&"Pass".to_string()));
+        assert!(result.contains(&"pass!".to_string()));
+        assert!(result.contains(&"adminpass".to_string()));
+    }
+
+    #[test]
+    fn test_expander_skips_long_words() {
+        let wp = WordProcessor::new(&test_config());
+        let long_word = "a".repeat(21);
+        let words = vec![long_word.clone()];
+        let result = wp.expander_technique(&words);
+        // Should only have the original word, no expanded variations
+        assert!(!result.contains(&format!("{}123", long_word)));
+    }
+
+    // --- cutb_technique ---
+
+    #[test]
+    fn test_cutb_contains_original() {
+        let wp = WordProcessor::new(&test_config());
+        let words = vec!["testing".into()];
+        let result = wp.cutb_technique(&words);
+        assert!(result.contains(&"testing".to_string()));
+    }
+
+    #[test]
+    fn test_cutb_cuts_beginning() {
+        let wp = WordProcessor::new(&test_config());
+        let words = vec!["testing".into()];
+        let result = wp.cutb_technique(&words);
+        assert!(result.contains(&"esting".to_string()));
+        assert!(result.contains(&"sting".to_string()));
+        assert!(result.contains(&"ting".to_string()));
+    }
+
+    #[test]
+    fn test_cutb_cuts_end() {
+        let wp = WordProcessor::new(&test_config());
+        let words = vec!["testing".into()];
+        let result = wp.cutb_technique(&words);
+        assert!(result.contains(&"testin".to_string()));
+        assert!(result.contains(&"testi".to_string()));
+        assert!(result.contains(&"test".to_string()));
+    }
+
+    #[test]
+    fn test_cutb_respects_min_length() {
+        let wp = WordProcessor::new(&test_config());
+        let words = vec!["abc".into()];
+        let result = wp.cutb_technique(&words);
+        // Should not produce words shorter than min_word_length (3)
+        for word in &result {
+            assert!(word.len() >= 3, "Word '{}' is shorter than min length", word);
+        }
+    }
+
+    #[test]
+    fn test_cutb_skips_short_words() {
+        let wp = WordProcessor::new(&test_config());
+        let words = vec!["ab".into()];
+        let result = wp.cutb_technique(&words);
+        // Only the original word (too short to cut)
+        assert_eq!(result.len(), 0); // "ab" is < 3, skipped
+    }
+
+    // --- prince_technique ---
+
+    #[test]
+    fn test_prince_contains_originals() {
+        let wp = WordProcessor::new(&test_config());
+        let words = vec!["hello".into(), "world".into()];
+        let result = wp.prince_technique(&words);
+        assert!(result.contains(&"hello".to_string()));
+        assert!(result.contains(&"world".to_string()));
+    }
+
+    #[test]
+    fn test_prince_combinations() {
+        let wp = WordProcessor::new(&test_config());
+        let words = vec!["hello".into(), "world".into()];
+        let result = wp.prince_technique(&words);
+        assert!(result.contains(&"helloworld".to_string()));
+        assert!(result.contains(&"hello_world".to_string()));
+        assert!(result.contains(&"hello-world".to_string()));
+        assert!(result.contains(&"hello.world".to_string()));
+    }
+
+    // --- lenfilter_technique ---
+
+    #[test]
+    fn test_lenfilter() {
+        let wp = WordProcessor::new(&test_config());
+        let words = vec!["ab".into(), "abc".into(), "abcde".into(), "abcdefghij".into()];
+        let result = wp.lenfilter_technique(&words, 3, 6);
+        assert_eq!(result.len(), 2);
+        assert!(result.contains(&"abc".to_string()));
+        assert!(result.contains(&"abcde".to_string()));
+    }
+
+    #[test]
+    fn test_lenfilter_empty() {
+        let wp = WordProcessor::new(&test_config());
+        let result = wp.lenfilter_technique(&[], 1, 10);
+        assert!(result.is_empty());
+    }
+
+    // --- cap2bin_technique ---
+
+    #[test]
+    fn test_cap2bin_lowercase() {
+        let wp = WordProcessor::new(&test_config());
+        let words = vec!["abc".into()];
+        let result = wp.cap2bin_technique(&words);
+        assert_eq!(result[0], "000");
+    }
+
+    #[test]
+    fn test_cap2bin_uppercase() {
+        let wp = WordProcessor::new(&test_config());
+        let words = vec!["ABC".into()];
+        let result = wp.cap2bin_technique(&words);
+        assert_eq!(result[0], "111");
+    }
+
+    #[test]
+    fn test_cap2bin_mixed() {
+        let wp = WordProcessor::new(&test_config());
+        let words = vec!["Hello1".into()];
+        let result = wp.cap2bin_technique(&words);
+        assert_eq!(result[0], "100002");
+    }
+
+    // --- generate_masks ---
+
+    #[test]
+    fn test_generate_masks_lowercase() {
+        let wp = WordProcessor::new(&test_config());
+        let words = vec!["abc".into()];
+        let result = wp.generate_masks(&words);
+        assert!(result.contains(&"?l?l?l".to_string()));
+    }
+
+    #[test]
+    fn test_generate_masks_mixed() {
+        let wp = WordProcessor::new(&test_config());
+        let words = vec!["Ab1!".into()];
+        let result = wp.generate_masks(&words);
+        assert!(result.contains(&"?u?l?d?s".to_string()));
+    }
+
+    #[test]
+    fn test_generate_masks_skips_long_words() {
+        let wp = WordProcessor::new(&test_config());
+        let words = vec!["a".repeat(17)];
+        let result = wp.generate_masks(&words);
+        assert!(result.is_empty());
+    }
+
+    // --- combinator_technique ---
+
+    #[test]
+    fn test_combinator() {
+        let wp = WordProcessor::new(&test_config());
+        let words1 = vec!["hello".into()];
+        let words2 = vec!["world".into()];
+        let result = wp.combinator_technique(&words1, &words2);
+        assert!(result.contains(&"helloworld".to_string()));
+        assert!(result.contains(&"hello_world".to_string()));
+    }
+
+    #[test]
+    fn test_combinator_respects_max_length() {
+        let mut config = test_config();
+        config.max_word_length = 8;
+        let wp = WordProcessor::new(&config);
+        let words1 = vec!["hello".into()];
+        let words2 = vec!["world".into()];
+        let result = wp.combinator_technique(&words1, &words2);
+        for word in &result {
+            assert!(word.len() <= 8, "Word '{}' exceeds max length", word);
+        }
+    }
+
+    // --- rli2_technique ---
+
+    #[test]
+    fn test_rli2_generates_rules() {
+        let wp = WordProcessor::new(&test_config());
+        let words = vec!["test".into()];
+        let rules = wp.rli2_technique(&words);
+        assert!(!rules.is_empty());
+        assert!(rules.contains(&"c test".to_string()));
+        assert!(rules.contains(&"u test".to_string()));
+        assert!(rules.contains(&"l test".to_string()));
+    }
+
+    #[test]
+    fn test_rli2_skips_short_words() {
+        let wp = WordProcessor::new(&test_config());
+        let words = vec!["ab".into()];
+        let rules = wp.rli2_technique(&words);
+        assert!(rules.is_empty());
+    }
+
+    // --- pack_statsgen ---
+
+    #[test]
+    fn test_pack_statsgen() {
+        let wp = WordProcessor::new(&test_config());
+        let stats = wp.pack_statsgen(&test_words());
+        assert_eq!(*stats.get("total_words").unwrap(), 4);
+        assert!(*stats.get("unique_lengths").unwrap() > 0);
+    }
+
+    #[test]
+    fn test_pack_statsgen_empty() {
+        let wp = WordProcessor::new(&test_config());
+        let stats = wp.pack_statsgen(&[]);
+        assert_eq!(*stats.get("total_words").unwrap(), 0);
+    }
+
+    // --- pack_policygen ---
+
+    #[test]
+    fn test_pack_policygen() {
+        let wp = WordProcessor::new(&test_config());
+        let policy = wp.pack_policygen(&test_words());
+        assert!(*policy.get("min_length").unwrap() > 0);
+        assert!(*policy.get("max_length").unwrap() >= *policy.get("min_length").unwrap());
+        assert!(*policy.get("has_lowercase").unwrap() > 0);
+    }
+
+    // --- pack_comprehensive_analysis ---
+
+    #[test]
+    fn test_pack_comprehensive_analysis() {
+        let wp = WordProcessor::new(&test_config());
+        let analysis = wp.pack_comprehensive_analysis(&test_words());
+        assert!(analysis.contains_key("total_words"));
+        assert!(analysis.contains_key("rules_generated"));
+        assert!(analysis.contains_key("masks_generated"));
+    }
+
+    // --- create_comprehensive_wordlist ---
+
+    #[test]
+    fn test_comprehensive_wordlist_includes_base_words() {
+        let wp = WordProcessor::new(&test_config());
+        let freq: HashMap<String, f64> = HashMap::new();
+        let result = wp.create_comprehensive_wordlist(&test_words(), &[], &freq);
+        for word in &test_words() {
+            assert!(result.contains(word), "Missing base word: {}", word);
+        }
+    }
+
+    #[test]
+    fn test_comprehensive_wordlist_includes_metadata() {
+        let wp = WordProcessor::new(&test_config());
+        let freq: HashMap<String, f64> = HashMap::new();
+        let metadata = vec!["extraword".to_string()];
+        let result = wp.create_comprehensive_wordlist(&test_words(), &metadata, &freq);
+        assert!(result.contains(&"extraword".to_string()));
+    }
+
+    #[test]
+    fn test_comprehensive_wordlist_includes_company_variations() {
+        let wp = WordProcessor::new(&test_config());
+        let freq: HashMap<String, f64> = HashMap::new();
+        let result = wp.create_comprehensive_wordlist(&[], &[], &freq);
+        assert!(result.contains(&"testcorp".to_string()));
+    }
+
+    // --- hybrid_attack ---
+
+    #[test]
+    fn test_hybrid_attack_produces_results() {
+        let wp = WordProcessor::new(&test_config());
+        let words = vec!["test".into()];
+        let result = wp.hybrid_attack(&words);
+        assert!(result.len() > 1);
+        assert!(result.contains(&"test".to_string()));
+    }
+
+    // --- analyze helpers ---
+
+    #[test]
+    fn test_analyze_charset() {
+        let wp = WordProcessor::new(&test_config());
+        assert_eq!(wp.analyze_charset("abc"), "l");
+        assert_eq!(wp.analyze_charset("ABC"), "u");
+        assert_eq!(wp.analyze_charset("123"), "d");
+        assert_eq!(wp.analyze_charset("aA1!"), "luds");
+    }
+
+    #[test]
+    fn test_analyze_pattern() {
+        let wp = WordProcessor::new(&test_config());
+        assert_eq!(wp.analyze_pattern("aB1!"), "luds");
+        assert_eq!(wp.analyze_pattern("Hello"), "ullll");
+    }
+
+    // --- apply_leetspeak_simple ---
+
+    #[test]
+    fn test_leetspeak_simple() {
+        let wp = WordProcessor::new(&test_config());
+        let result = wp.apply_leetspeak_simple("password");
+        assert!(result.contains('0')); // o -> 0
+        assert!(result.contains('5')); // s -> 5
+    }
+}
